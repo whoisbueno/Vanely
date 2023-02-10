@@ -1,5 +1,5 @@
-entrypoint = "index.js"
-
+entrypoint = "src/index.js"
+run = "npm start"
 hidden = [".config", "package-lock.json"]
 
 [interpreter]
