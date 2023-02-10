@@ -1,5 +1,5 @@
 import ClientOptions from "./ClientOptions";
-import { Client, Collection } from "discord.js";
+import { Client, Collection, Partials, GatewayIntentBits } from "discord.js";
 import { connect } from "mongoose";
 import { join } from "path";
 import { readdirSync } from "fs";
@@ -8,7 +8,7 @@ class Vanely extends Client {
   constructor(options) {
     super({
       intents: [
-    GatewayIntentBits.Guilds,
+GatewayIntentBits.Guilds,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
