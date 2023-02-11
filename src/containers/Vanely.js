@@ -14,28 +14,28 @@ export default class Vanely extends Client {
   registryCommands() { 
     this.application.commands.set(this.commands) 
   }
-  loadCommands(path = 'src/resources/commands') {
+  async loadCommands(path = 'src/resources/interactions') {
          const categories = readdirSync(path)
 
         for (const category of categories) {
             const commands = readdirSync(`${path}/${category}`)
 
             for (const command of commands) {
-                const commandClass = require(join(process.cwd(), `${path}/${category}/${command}`))
+                const commandClass = await import(join(process.cwd(), `${path}/${category}/${command}.js`))
                 const cmd = new (commandClass)(this)
 
                 this.commands.set(cmd.name, cmd)
             }
         }
     }
-  loadEvents(path = 'src/resources/listenerIn') {
+  async loadEvents(path = 'src/resources/listenerIn') {
         const categories = readdirSync(path)
 
         for (const category of categories) {
             const events = readdirSync(`${path}/${category}`)
 
             for (const event of events) {
-                const eventClass = require(join(process.cwd(), `${path}/${category}/${event}`))
+const eventClass = await import(join(process.cwd(), `${path}/${category}/${event}.js`))
                 const evt = new (eventClass)(this)
 
                 this.on(evt.name, evt.run)

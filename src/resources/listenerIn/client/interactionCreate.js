@@ -1,7 +1,7 @@
-import Event from '../../../base/Event';
-import Guild from '../../database/models/Guild';
-import User from '../../database/models/User';
-import Command from '../../database/models/Command';
+import Event from '../../../base/Event.js';
+import Guild from '../../database/models/Guild.js';
+import User from '../../database/models/User.js';
+import Command from '../../database/models/Command.js';
 import { ButtonBuilder, EmbedBuilder, ActionRowBuilder } from 'discord.js';
 
 export default class InteractionCreateEvent extends Event {
@@ -11,8 +11,7 @@ export default class InteractionCreateEvent extends Event {
     });
   }
 
-  async run(interaction) {
-    const ctx = interaction;
+  async run(ctx) {
     if (ctx.isCommand()) {
       if (!ctx.guild) return;
 
@@ -36,7 +35,7 @@ export default class InteractionCreateEvent extends Event {
           ctx.reply({ content: "registrado registrado sucesso usa dnv isso", ephemeral: true });
         }
 
-        const lang = require(`../../languages/${guild.lang}`);
+        import lang from `../../languages/${guild.lang}.js`;
         cmd.run(ctx, lang);
       }
     }
