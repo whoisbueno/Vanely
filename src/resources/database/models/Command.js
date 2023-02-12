@@ -1,13 +1,13 @@
-import { Schema, model } from "mongoose";
+import { model, Schema } from 'mongoose';
 
-let commandSchema = new Schema({
-  idC: {
-    type: String
-  },
-  commands: {
-    type: Number,
-    default: 0
-  }
-})
+const commandSchema = new Schema({
+	idC: {
+		type: String,
+	},
+	commands: {
+		type: Number,
+		default: 0,
+	},
+});
 
 export default model('Commands', commandSchema);

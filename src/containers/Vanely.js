@@ -1,64 +1,63 @@
-import ClientOptions from "./ClientOptions.js";
-import { Client, Collection, Partials, GatewayIntentBits } from "discord.js";
-import { connect } from "mongoose";
-import { join } from "path";
-import { readdirSync } from "fs";
+import { readdir } from 'node:fs/promises';
+import { setTimeout as sleep } from 'node:timers/promises';
+import chalk from 'chalk';
+import { Client, Collection } from 'discord.js';
+import { connect } from 'mongoose';
+import ClientOptions from './ClientOptions.js';
 
 export default class Vanely extends Client {
-  constructor(options) {
-    super(ClientOptions);
-    this.commands = new Collection();
-    this.loadCommands() 
-    this.loadEvents()
-  }
-  registryCommands() { 
-    this.application.commands.set(this.commands) 
-  }
-  async loadCommands(path = 'src/resources/interactions') {
-         const categories = readdirSync(path)
+	constructor() {
+		super(ClientOptions);
 
-        for (const category of categories) {
-            const commands = readdirSync(`${path}/${category}`)
+		this.commands = new Collection();
+	}
 
-            for (const command of commands) {
-                const commandClass = await import(join(process.cwd(), `${path}/${category}/${command}.js`))
-                const cmd = new (commandClass)(this)
+	async loadCommands(client) {
+		const categories = await readdir('./src/resources/interactions');
 
-                this.commands.set(cmd.name, cmd)
-            }
-        }
-    }
-  async loadEvents(path = 'src/resources/listenerIn') {
-        const categories = readdirSync(path)
+		for await (const category of categories) {
+			const commands = await readdir(`./src/resources/interactions/${category}`);
 
-        for (const category of categories) {
-            const events = readdirSync(`${path}/${category}`)
+			for (const command of commands) {
+				const { default: CommandClass } = await import(`../resources/interactions/${category}/${command}`);
+				const cmd = new CommandClass(client);
 
-            for (const event of events) {
-const eventClass = await import(join(process.cwd(), `${path}/${category}/${event}.js`))
-                const evt = new (eventClass)(this)
+				client.commands.set(cmd.name, cmd);
+			}
+		}
+	}
 
-                this.on(evt.name, evt.run)
-            
-            }
-        }
-    }
+	async loadEvents(client) {
+		const categories = await readdir('./src/resources/listenerIn');
 
-  async connectToDatabase() {
-          const start = await connect(process.env.MONGO_DATABASE, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        })
+		for await (const category of categories) {
+			const events = await readdir(`./src/resources/listenerIn/${category}`);
 
-        console.log(`${chalk.blue(`${Date().toLocaleString('pt-br')}`)} -> MongoDB Logged`)
+			for (const event of events) {
+				const { default: EventClass } = await import(`../resources/listenerIn/${category}/${event}`);
+				const evt = new EventClass(client);
 
-        this.db = { start, ...Models }
-   }
-  connect() {
-    try {  super.login(process.env.TOKEN)
-         console.log(`${chalk.blue(`${Date().toLocaleString('pt-br')}`)} -> Client Vanely Logged`)
-     } catch(e) {
-      console.log("[API ERROR] " + e)
-    }
-  }
+				client.on(evt.name, (...args) => evt.run(client, ...args));
+			}
+		}
+	}
+
+	async connectToDatabase() {
+		await connect(process.env.MONGO_DATABASE, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+		});
+
+		console.log(`${chalk.blue(`${new Date().toLocaleString('pt-br')}`)} -> MongoDB Logged`);
+	}
+
+	async connect() {
+		await sleep(1_000);
+		this.loadCommands(this);
+		this.loadEvents(this);
+		this.connectToDatabase();
+
+		await sleep(2_500);
+		super.login(process.env.TOKEN);
+	}
 }

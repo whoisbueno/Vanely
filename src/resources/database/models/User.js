@@ -1,6 +1,6 @@
-import { Schema, model } from "mongoose";
+import { model, Schema } from 'mongoose';
 
-let userSchema = new Schema({
+const userSchema = new Schema({
 	idU: { type: String },
 
 	registrado: { type: Boolean, default: false },
