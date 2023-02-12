@@ -1,0 +1,7 @@
+{
+	"extends": ["neon/common", "neon/node", "neon/prettier"],
+	"rules": {
+		"no-restricted-globals": "off",
+		"n/prefer-global/process": "off"
+	}
+}
