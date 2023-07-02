@@ -6,15 +6,9 @@ export default class PingCommand extends Command {
 			name: 'ping',
 			description: 'Returns pong',
 		});
-
-		this.config = {
-			ephemeral: false,
-			autoDefer: true,
-			requireDatabase: false,
-		};
 	}
 
-	run(interaction) {
+	async run(interaction) {
 		interaction.editReply({ content: `Pong! ${this.client.ws.ping}ms` });
 	}
 }

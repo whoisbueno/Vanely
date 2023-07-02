@@ -31,8 +31,6 @@ export default class InteractionCreateEvent extends Event {
 			});
 		}
 
-		if (command.config.autoDefer) await interaction.deferReply({ ephemeral: command.config.ephemeral });
-
 		command.run(interaction);
 	}
 }
